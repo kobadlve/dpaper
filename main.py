@@ -1,10 +1,9 @@
-# This is a test script.
-
 from dbx_client import (
     DBXClient
 )
 import inquirer
 import click
+from tqdm import tqdm
 
 
 @click.group()
@@ -12,11 +11,12 @@ def main():
     pass
 
 
-@main.command()
-def interactive():
+@main.command(help='Interactive mode.')
+def i():
     c = DBXClient()
     c.get_folders()
 
+    print("end: ", c.folders.keys())
     # Select folder.
     questions = [
         inquirer.List('name',
@@ -45,19 +45,34 @@ def interactive():
     print(doc.data)
 
 
-@main.command()
-def list():
-    pass
+@main.command(help='Show list of documents.')
+def l():
+    c = DBXClient()
+    docs = {}
+    for doc_id in tqdm(c.docs_list.doc_ids):
+        doc = c.download_doc(doc_id)
+        docs[doc.title] = doc.doc_id
+    sorted_docs = sorted(docs.items(), key=lambda x: x[0])
+    for doc in sorted_docs:
+        print('{}: {}'.format(doc[0], doc[1]))
 
 
-@main.command()
-def cat():
-    pass
+@main.command(help='Show document data with id.')
+@click.argument('doc_id')
+def c(doc_id):
+    c = DBXClient()
+    doc = c.download_doc(doc_id)
+    print(doc.data)
 
 
-@main.command()
-def downlaod():
-    pass
+@main.command(help='Download document with id.')
+@click.argument('doc_id')
+def d(doc_id):
+    c = DBXClient()
+    doc = c.download_doc(doc_id)
+    f = open(doc.title + '.md', 'w')
+    f.write(doc.data)
+    f.close()
 
 
 if __name__ == '__main__':
