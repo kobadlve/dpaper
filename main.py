@@ -13,6 +13,7 @@ def main():
 
 @main.command(help='Interactive mode.')
 def i():
+    """Interactive mode."""
     c = DBXClient()
     c.get_folders()
 
@@ -47,6 +48,7 @@ def i():
 
 @main.command(help='Show list of documents.')
 def l():
+    """Show list."""
     c = DBXClient()
     docs = {}
     for doc_id in tqdm(c.docs_list.doc_ids):
@@ -60,6 +62,7 @@ def l():
 @main.command(help='Show document data with id.')
 @click.argument('doc_id')
 def c(doc_id):
+    """Show document."""
     c = DBXClient()
     doc = c.download_doc(doc_id)
     print(doc.data)
@@ -68,6 +71,7 @@ def c(doc_id):
 @main.command(help='Download document with id.')
 @click.argument('doc_id')
 def d(doc_id):
+    """Download document."""
     c = DBXClient()
     doc = c.download_doc(doc_id)
     f = open(doc.title + '.md', 'w')
